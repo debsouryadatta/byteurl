@@ -16,6 +16,9 @@ export const fetchUserShortenedUrlsAction = async () => {
         const shortenedUrls = await db.url.findMany({
             where: {
                 userId: userId
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         })
         return shortenedUrls;

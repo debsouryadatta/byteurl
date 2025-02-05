@@ -10,7 +10,7 @@ import { UrlCard } from './url-card';
 import { nanoid } from 'nanoid';
 import { createPageContentAndSummaryAction, createShortUrlAction, deleteShortUrlAction, fetchUserShortenedUrlsAction, updateUrlAction } from '@/lib/actions';
 import { Card, CardContent } from './ui/card';
-import { LogIn, Link2 } from 'lucide-react';
+import { LogIn, Link2, Loader2 } from 'lucide-react';
 
 export function UrlShortener() {
   const [url, setUrl] = useState('');
@@ -19,6 +19,7 @@ export function UrlShortener() {
   const [summaryLoading, setSummaryLoading] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [fetchLoading, setFetchLoading] = useState(false);
   const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,9 +106,17 @@ export function UrlShortener() {
 
   useEffect(() => {
     const fetchUserShortenedUrls = async () => {
-      if (!userId) return;
-      const shortenedUrls = await fetchUserShortenedUrlsAction();
-      setShortenedUrls(shortenedUrls);
+      setFetchLoading(true);
+      try {
+        if (!userId) return;
+        const shortenedUrls = await fetchUserShortenedUrlsAction();
+        setShortenedUrls(shortenedUrls);
+      } catch (error) {
+        console.log("Error fetching user shortened URLs:", error);
+        toast.error('Error fetching user shortened URLs. Please try again.');
+      } finally {
+        setFetchLoading(false);
+      }
     };
 
     fetchUserShortenedUrls();
@@ -131,7 +140,11 @@ export function UrlShortener() {
       </form>
 
       <div className="space-y-4">
-        {!isSignedIn || !isLoaded ? (
+        {fetchLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="animate-spin w-10 h-10 text-muted-foreground" />
+          </div>
+        ) : !isSignedIn || !isLoaded ? (
           <Card className="p-8">
             <CardContent className="flex flex-col items-center justify-center space-y-4 text-center">
               <LogIn className="h-12 w-12 text-muted-foreground" />
