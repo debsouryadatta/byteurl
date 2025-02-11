@@ -9,8 +9,35 @@ import { ClerkProvider } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ByteUrl - Modern URL Shortener",
-  description: "Shorten, track, and share your links efficiently",
+  title: "ByteUrl",
+  description: "Smart URL Shortener with AI-Powered Features",
+  openGraph: {
+    type: "website",
+    title: "ByteUrl",
+    description: "Smart URL Shortener with AI-Powered Features",
+    url: "https://byteurl-eight.vercel.app/",
+    siteName: "ByteUrl",
+    images: [{
+      url: "https://res.cloudinary.com/diyxwdtjd/image/upload/v1739300258/projects/byte_url.png",
+      width: 1200,
+      height: 630,
+      alt: "ByteUrl Preview Image",
+    }],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ByteUrl",
+    description: "Smart URL Shortener with AI-Powered Features",
+    site: "https://byteurl-eight.vercel.app/",
+    images: [{
+      url: "https://res.cloudinary.com/diyxwdtjd/image/upload/v1739300258/projects/byte_url.png",
+      alt: "ByteUrl Preview Image",
+    }],
+  },
+  icons: {
+    shortcut: "https://res.cloudinary.com/diyxwdtjd/image/upload/v1739300258/projects/byte_url.png",
+  }
 };
 
 export default function RootLayout({
