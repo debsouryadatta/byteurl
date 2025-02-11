@@ -11,9 +11,13 @@ import { nanoid } from 'nanoid';
 import { createPageContentAndSummaryAction, createShortUrlAction, deleteShortUrlAction, fetchUserShortenedUrlsAction, updateUrlAction } from '@/lib/actions';
 import { Card, CardContent } from './ui/card';
 import { LogIn, Link2, Loader2 } from 'lucide-react';
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
+import { Wand2 } from 'lucide-react';
 
 export function UrlShortener() {
   const [url, setUrl] = useState('');
+  const [useAiName, setUseAiName] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [shortenedUrls, setShortenedUrls] = useState<Url[]>([]);
   const [summaryLoading, setSummaryLoading] = useState<string | null>(null);
@@ -24,7 +28,6 @@ export function UrlShortener() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     if (!url) {
       toast.error('Please enter a URL');
       return;
@@ -33,8 +36,9 @@ export function UrlShortener() {
       toast.error('Please sign in to shorten a URL');
       return;
     }
+    setIsLoading(true);
     try {
-      const newUrl = await createShortUrlAction(url);
+      const newUrl = await createShortUrlAction(url, useAiName);
       setShortenedUrls((prev) => [newUrl, ...prev]);
       toast.success('URL shortened successfully!');
     } catch (error) {
@@ -125,17 +129,29 @@ export function UrlShortener() {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            type="url"
-            placeholder="Enter your long URL here..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="flex-1"
-          />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Shortening...' : 'Shorten'}
-          </Button>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              type="url"
+              placeholder="Enter your long URL here..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit" disabled={isLoading} className="whitespace-nowrap">
+              {isLoading ? 'Shortening...' : 'Shorten'}
+            </Button>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="ai-name"
+              checked={useAiName}
+              onCheckedChange={setUseAiName}
+            />
+            <Label htmlFor="ai-name" className="flex items-center gap-2 cursor-pointer">
+              Generate name with AI <Wand2 className="h-4 w-4" />
+            </Label>
+          </div>
         </div>
       </form>
 

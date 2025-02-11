@@ -1,3 +1,4 @@
+import Footer from '@/components/footer';
 import { UrlShortener } from '@/components/url-shortener';
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
         </div>
         <UrlShortener />
       </main>
+      <Footer />
     </div>
   );
 }

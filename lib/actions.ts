@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import { nanoid } from 'nanoid';
 import QRCode from 'qrcode';
 import { getPhotoUrl } from "./cloudinary";
-import { responseFromGemini } from "./openai";
+import { generateName, generateSummary } from "./openai";
 
 export const fetchUserShortenedUrlsAction = async () => {
     try {
@@ -28,11 +28,17 @@ export const fetchUserShortenedUrlsAction = async () => {
     }
 }
 
-export const createShortUrlAction = async (originalUrl: string) => {
+export const createShortUrlAction = async (originalUrl: string, useAiName: boolean) => {
     try {
         const { userId } = await auth();
         if (!userId) {
             throw new Error('User not authenticated');
+        }
+        let name: string | null = null;
+        if (useAiName) {
+            let pageContent: any = await fetch(`${process.env.CRAWL4AI_BE_URL}/crawl?url=${originalUrl}`)
+            pageContent = await pageContent.json()
+            name = await generateName(pageContent.markdown)
         }
         const shortCode = nanoid(8);
         const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${shortCode}`;
@@ -44,7 +50,7 @@ export const createShortUrlAction = async (originalUrl: string) => {
                 originalUrl: originalUrl,
                 shortUrl: shortUrl,
                 shortCode: shortCode,
-                name: shortUrl,
+                name: name || shortUrl,
                 userId: userId,
                 qrCodeUrl: qrCodeUrl
             }
@@ -99,7 +105,7 @@ export const createPageContentAndSummaryAction = async (originalUrl: string, id:
     try {
       let pageContent: any = await fetch(`${process.env.CRAWL4AI_BE_URL}/crawl?url=${originalUrl}`)
       pageContent = await pageContent.json()
-      const summary = await responseFromGemini(pageContent.markdown)
+      const summary = await generateSummary(pageContent.markdown)
       await db.url.update({
         where: { id: id },
         data: {
