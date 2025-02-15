@@ -56,7 +56,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-              <Navbar />
+              {/* <Navbar /> */}
               {children}
               <Toaster />
             </div>
